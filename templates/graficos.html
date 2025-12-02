@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}Gráficos Interactivos{% endblock %}
+
+{% block content %}
+<div class="animate-fade-in">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-4" style="color: var(--color-primario);">
+                <i class="fas fa-chart-line me-2"></i>
+                Gráficos Interactivos del Estudio
+            </h2>
+            
+            {% if error %}
+            <div class="alert alert-danger">
+                {{ error }}
+            </div>
+            {% else %}
+            
+            <!-- Gráfico 1: Composición por Edad -->
+            <div class="chart-container mb-5">
+                <h4 class="chart-title">
+                    <i class="fas fa-chart-pie me-2"></i>
+                    Composición Poblacional por Edad
+                </h4>
+                <p class="text-muted mb-3">
+                    Distribución de los 279 individuos en las categorías de edad: Adultos, Subadultos y Juveniles.
+                </p>
+                <div id="grafico-composicion" style="height: 500px;"></div>
+            </div>
+
+            <!-- Gráficos en fila -->
+            <div class="row mb-5">
+                <div class="col-lg-6">
+                    <div class="chart-container h-100">
+                        <h4 class="chart-title">
+                            <i class="fas fa-venus-mars me-2"></i>
+                            Distribución por Sexo
+                        </h4>
+                        <p class="text-muted mb-3">
+                            Comparación entre machos y hembras en la población estudiada.
+                        </p>
+                        <div id="grafico-sexo" style="height: 400px;"></div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6">
+                    <div class="chart-container h-100">
+                        <h4 class="chart-title">
+                            <i class="fas fa-weight-scale me-2"></i>
+                            Distribución de Pesos
+                        </h4>
+                        <p class="text-muted mb-3">
+                            Histograma de frecuencias de pesos con líneas de media y mediana.
+                        </p>
+                        <div id="grafico-pesos" style="height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico Boxplot -->
+            <div class="chart-container mb-5">
+                <h4 class="chart-title">
+                    <i class="fas fa-chart-line me-2"></i>
+                    Análisis de Dimorfismo Sexual por Peso
+                </h4>
+                <p class="text-muted mb-3">
+                    Comparación de distribución de pesos por categoría de edad y sexo.
+                </p>
+                <div id="grafico-boxplot" style="height: 500px;"></div>
+            </div>
+
+
+
+
+            <!-- Gráfico Temporal --->
+            <div class="chart-container mb-5">
+                <h4 class="chart-title">
+                    <i class="fas fa-calendar-alt me-2"></i>
+                    Serie Temporal de Ingresos
+                </h4>
+                <p class="text-muted mb-3">
+                    Evolución de los ingresos de iguanas al centro durante el período de estudio.
+                </p>
+                <div id="grafico-temporal" style="height: 500px;"></div>
+            </div>
+
+    
+
+
+
+        
+            <!-- Información Adicional -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card border-0 shadow">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Interpretación de los Gráficos
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-4">
+                                <div class="col-md-4">
+                                    <div class="card h-100 border-0 bg-light">
+                                        <div class="card-body">
+                                            <h6>
+                                                <i class="fas fa-chart-pie me-2" style="color: var(--color-primario);"></i>
+                                                Composición por Edad
+                                            </h6>
+                                            <p class="small text-muted mb-0">
+                                                Muestra la estructura poblacional en tres categorías de edad. 
+                                                Una alta proporción de adultos sugiere estabilidad poblacional.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="card h-100 border-0 bg-light">
+                                        <div class="card-body">
+                                            <h6>
+                                                <i class="fas fa-weight-scale me-2" style="color: var(--color-destacado);"></i>
+                                                Distribución de Pesos
+                                            </h6>
+                                            <p class="small text-muted mb-0">
+                                                El histograma revela patrones de crecimiento y desarrollo. 
+                                                Las líneas verticales muestran el peso promedio y la mediana.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="card h-100 border-0 bg-light">
+                                        <div class="card-body">
+                                            <h6>
+                                                <i class="fas fa-venus-mars me-2" style="color: var(--color-accent);"></i>
+                                                Boxplot de Pesos
+                                            </h6>
+                                            <p class="small text-muted mb-0">
+                                                Permite comparar pesos entre grupos y detectar diferencias 
+                                                significativas (dimorfismo sexual) y valores atípicos.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Cargar gráficos
+    document.addEventListener('DOMContentLoaded', function() {
+        try {
+            // Gráfico de Composición
+            if ('{{ graficos_data.composicion|safe }}') {
+                const composicionData = JSON.parse('{{ graficos_data.composicion|safe }}');
+                Plotly.newPlot('grafico-composicion', composicionData.data, composicionData.layout);
+            }
+            
+            // Gráfico de Sexo
+            if ('{{ graficos_data.sexo|safe }}') {
+                const sexoData = JSON.parse('{{ graficos_data.sexo|safe }}');
+                Plotly.newPlot('grafico-sexo', sexoData.data, sexoData.layout);
+            }
+            
+            // Gráfico de Pesos
+            if ('{{ graficos_data.pesos|safe }}') {
+                const pesosData = JSON.parse('{{ graficos_data.pesos|safe }}');
+                Plotly.newPlot('grafico-pesos', pesosData.data, pesosData.layout);
+            }
+            
+            // Gráfico Boxplot
+            if ('{{ graficos_data.boxplot|safe }}') {
+                const boxplotData = JSON.parse('{{ graficos_data.boxplot|safe }}');
+                Plotly.newPlot('grafico-boxplot', boxplotData.data, boxplotData.layout);
+            }
+            
+            // Gráfico Temporal
+            if ('{{ graficos_data.temporal|safe }}') {
+            const temporalData = JSON.parse('{{ graficos_data.temporal|safe }}');
+            Plotly.newPlot('grafico-temporal', temporalData.data, temporalData.layout);
+            }
+            
+        } catch (error) {
+            console.error('Error cargando gráficos:', error);
+        }
+    });
+</script>
+{% endblock %}

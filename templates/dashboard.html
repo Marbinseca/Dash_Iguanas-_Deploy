@@ -1,0 +1,434 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Métricas KPIs{% endblock %}
+
+{% block content %}
+<div class="animate-fade-in">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-4" style="color: var(--color-primario);">
+                <i class="fas fa-tachometer-alt me-2"></i>
+                Dashboard de Métricas - Estudio Iguana
+            </h2>
+            
+            {% if error %}
+            <div class="alert alert-danger">
+                {{ error }}
+            </div>
+            {% else %}
+            
+            <!-- KPIs Principales -->
+            <div class="row g-4 mb-5">
+                <div class="col-lg-3 col-md-6">
+                    <div class="card kpi-card shadow border-0">
+                        <div class="card-body text-center p-4">
+                            <div class="kpi-icon mb-3">
+                                <i class="fas fa-dragon"></i>
+                            </div>
+                            <h1 class="kpi-value">{{ total_iguanas }}</h1>
+                            <p class="kpi-title">Total de Iguanas</p>
+                            <p class="small text-muted mb-0">Individuos estudiados</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6">
+                    <div class="card kpi-card shadow border-0">
+                        <div class="card-body text-center p-4">
+                            <div class="kpi-icon mb-3">
+                                <i class="fas fa-weight-scale"></i>
+                            </div>
+                            <h1 class="kpi-value">{{ peso_promedio }} kg</h1>
+                            <p class="kpi-title">Peso Promedio</p>
+                            <p class="small text-muted mb-0">
+                                Rango: {{ peso_min }} - {{ peso_max }} kg
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6">
+                    <div class="card kpi-card shadow border-0">
+                        <div class="card-body text-center p-4">
+                            <div class="kpi-icon mb-3">
+                                <i class="fas fa-venus-mars"></i>
+                            </div>
+                            <h1 class="kpi-value">{{ proporcion_machos }}%</h1>
+                            <p class="kpi-title">Proporción Machos</p>
+                            <p class="small text-muted mb-0">
+                                Machos: {{ machos }} | Hembras: {{ hembras }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6">
+                    <div class="card kpi-card shadow border-0">
+                        <div class="card-body text-center p-4">
+                            <div class="kpi-icon mb-3">
+                                <i class="fas fa-chart-pie"></i>
+                            </div>
+                            <h1 class="kpi-value">{{ porcentaje_adultos }}%</h1>
+                            <p class="kpi-title">Adultos Dominantes</p>
+                            <p class="small text-muted mb-0">
+                                {{ total_adultos }} de {{ total_iguanas }} individuos
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráficos Principales -->
+            <div class="row mb-5">
+                <div class="col-12">
+                    <div class="chart-container">
+                        <h4 class="chart-title">
+                            <i class="fas fa-chart-pie me-2"></i>
+                            Composición Poblacional por Edad
+                        </h4>
+                        <div id="grafico-composicion" style="height: 500px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-5">
+                <div class="col-lg-6">
+                    <div class="chart-container h-100">
+                        <h4 class="chart-title">
+                            <i class="fas fa-venus-mars me-2"></i>
+                            Distribución por Sexo
+                        </h4>
+                        <div id="grafico-sexo" style="height: 400px;"></div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6">
+                    <div class="chart-container h-100">
+                        <h4 class="chart-title">
+                            <i class="fas fa-weight-scale me-2"></i>
+                            Distribución de Pesos
+                        </h4>
+                        <div id="grafico-pesos" style="height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-5">
+                <div class="col-12">
+                    <div class="chart-container">
+                        <h4 class="chart-title">
+                            <i class="fas fa-chart-line me-2"></i>
+                            Peso por Edad y Sexo - Análisis de Dimorfismo
+                        </h4>
+                        <div id="grafico-boxplot" style="height: 500px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Distribuciones Detalladas -->
+            <div class="row mb-5">
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow h-100">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-users me-2"></i>
+                                Distribución por Edad
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Adultos -->
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="badge badge-custom" style="background-color: var(--color-primario);">
+                                        Adultos
+                                    </span>
+                                    <span class="fw-bold">
+                                        {{ total_adultos }} ({{ porcentaje_adultos }}%)
+                                    </span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar" 
+                                         style="width: {{ porcentaje_adultos }}%; background-color: var(--color-primario);">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Subadultos -->
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="badge badge-custom" style="background-color: var(--color-destacado);">
+                                        Subadultos
+                                    </span>
+                                    <span class="fw-bold">
+                                        {{ total_subadultos }} ({{ porcentaje_subadultos }}%)
+                                    </span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar" 
+                                         style="width: {{ porcentaje_subadultos }}%; background-color: var(--color-destacado);">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Juveniles -->
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="badge badge-custom" style="background-color: var(--color-secundario);">
+                                        Juveniles
+                                    </span>
+                                    <span class="fw-bold">
+                                        {{ total_juveniles }} ({{ porcentaje_juveniles }}%)
+                                    </span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar" 
+                                         style="width: {{ porcentaje_juveniles }}%; background-color: var(--color-secundario);">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow h-100">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-venus-mars me-2"></i>
+                                Distribución por Sexo
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-4">
+                                <div class="col-6 text-center">
+                                    <div class="mb-2">
+                                        <i class="fas fa-mars fa-3x" style="color: var(--color-primario);"></i>
+                                    </div>
+                                    <h3>{{ machos }}</h3>
+                                    <p class="text-muted mb-0">Machos</p>
+                                    <small class="text-muted">{{ porcentaje_machos }}%</small>
+                                </div>
+                                <div class="col-6 text-center">
+                                    <div class="mb-2">
+                                        <i class="fas fa-venus fa-3x" style="color: var(--color-destacado);"></i>
+                                    </div>
+                                    <h3>{{ hembras }}</h3>
+                                    <p class="text-muted mb-0">Hembras</p>
+                                    <small class="text-muted">{{ porcentaje_hembras }}%</small>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <small>Machos</small>
+                                    <small>{{ porcentaje_machos }}%</small>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar" 
+                                         style="width: {{ porcentaje_machos }}%; background-color: var(--color-primario);">
+                                    </div>
+                                    <div class="progress-bar" 
+                                         style="width: {{ porcentaje_hembras }}%; background-color: var(--color-destacado);">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow h-100">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-chart-bar me-2"></i>
+                                Resumen Estadístico
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>
+                                        <i class="fas fa-weight me-2" style="color: var(--color-primario);"></i>
+                                        Peso Promedio
+                                    </span>
+                                    <span class="fw-bold">{{ peso_promedio }} kg</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>
+                                        <i class="fas fa-arrow-up me-2" style="color: green;"></i>
+                                        Peso Máximo
+                                    </span>
+                                    <span class="fw-bold">{{ peso_max }} kg</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>
+                                        <i class="fas fa-arrow-down me-2" style="color: red;"></i>
+                                        Peso Mínimo
+                                    </span>
+                                    <span class="fw-bold">{{ peso_min }} kg</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>
+                                        <i class="fas fa-chart-pie me-2" style="color: var(--color-accent);"></i>
+                                        Proporción Adultos
+                                    </span>
+                                    <span class="fw-bold">{{ porcentaje_adultos }}%</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>
+                                        <i class="fas fa-venus-mars me-2" style="color: purple;"></i>
+                                        Ratio M:H
+                                    </span>
+                                    <span class="fw-bold">
+                                        {% if ratio_mh %}
+                                            {{ ratio_mh }}:1
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Insights -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card border-0 shadow">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-lightbulb me-2"></i>
+                                Insights del Análisis
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="alert alert-custom alert-success">
+                                        <h6>
+                                            <i class="fas fa-check-circle me-2"></i>
+                                            Población Adulta Dominante
+                                        </h6>
+                                        <p class="mb-0">
+                                            Los adultos representan el {{ porcentaje_adultos }}% 
+                                            de la población, sugiriendo una población estable con alta tasa de supervivencia.
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="alert alert-custom alert-info">
+                                        <h6>
+                                            <i class="fas fa-venus-mars me-2"></i>
+                                            Sesgo hacia Machos
+                                        </h6>
+                                        <p class="mb-0">
+                                            Los machos representan el {{ proporcion_machos }}% de la población, 
+                                            indicando posible dimorfismo sexual en supervivencia o captura.
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="alert alert-custom alert-warning">
+                                        <h6>
+                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                            Baja Proporción de Juveniles
+                                        </h6>
+                                        <p class="mb-0">
+                                            Solo el {{ porcentaje_juveniles }}% son juveniles, 
+                                            lo que requiere atención para asegurar renovación poblacional.
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="alert alert-custom alert-primary">
+                                        <h6>
+                                            <i class="fas fa-weight-scale me-2"></i>
+                                            Amplio Rango de Pesos
+                                        </h6>
+                                        <p class="mb-0">
+                                            Pesos varían de {{ peso_min }} a {{ peso_max }} kg, 
+                                            mostrando diversidad en desarrollo individual.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Cargar gráficos cuando el DOM esté listo
+    document.addEventListener('DOMContentLoaded', function() {
+        // Gráfico de Composición por Edad
+        try {
+            if ('{{ grafico_composicion|safe }}') {
+                const composicionData = JSON.parse('{{ grafico_composicion|safe }}');
+                Plotly.newPlot('grafico-composicion', composicionData.data, composicionData.layout);
+            }
+        } catch (error) {
+            console.error('Error cargando gráfico de composición:', error);
+        }
+        
+        // Gráfico de Distribución por Sexo
+        try {
+            if ('{{ grafico_sexo|safe }}') {
+                const sexoData = JSON.parse('{{ grafico_sexo|safe }}');
+                Plotly.newPlot('grafico-sexo', sexoData.data, sexoData.layout);
+            }
+        } catch (error) {
+            console.error('Error cargando gráfico de sexo:', error);
+        }
+        
+        // Gráfico de Distribución de Pesos
+        try {
+            if ('{{ grafico_pesos|safe }}') {
+                const pesosData = JSON.parse('{{ grafico_pesos|safe }}');
+                Plotly.newPlot('grafico-pesos', pesosData.data, pesosData.layout);
+            }
+        } catch (error) {
+            console.error('Error cargando gráfico de pesos:', error);
+        }
+        
+        // Gráfico Boxplot
+        try {
+            if ('{{ grafico_boxplot|safe }}') {
+                const boxplotData = JSON.parse('{{ grafico_boxplot|safe }}');
+                Plotly.newPlot('grafico-boxplot', boxplotData.data, boxplotData.layout);
+            }
+        } catch (error) {
+            console.error('Error cargando gráfico boxplot:', error);
+        }
+    });
+    
+    // Función para actualizar KPIs automáticamente
+    function actualizarKPIs() {
+        fetch('/api/kpis')
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('Error en API:', data.error);
+                    return;
+                }
+                
+                // Actualizar KPIs en tiempo real (ejemplo)
+                console.log('KPIs actualizados:', data);
+            })
+            .catch(error => console.error('Error actualizando KPIs:', error));
+    }
+    
+    // Actualizar cada 30 segundos (opcional)
+    // setInterval(actualizarKPIs, 30000);
+</script>
+{% endblock %}

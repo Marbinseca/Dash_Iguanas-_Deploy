@@ -1,0 +1,517 @@
+{% extends "base.html" %}
+
+{% block title %}Tabla de Datos{% endblock %}
+
+{% block content %}
+<div class="animate-fade-in">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-4" style="color: var(--color-primario);">
+                <i class="fas fa-table me-2"></i>
+                Tabla de Datos Completa
+            </h2>
+            
+            {% if error %}
+            <div class="alert alert-danger">
+                {{ error }}
+            </div>
+            {% else %}
+            
+            <!-- Resumen Estadístico -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-chart-bar me-2"></i>
+                                Resumen del Dataset
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3 text-center mb-3">
+                                    <h1 class="display-6" style="color: var(--color-primario);">
+                                        {{ total_registros }}
+                                    </h1>
+                                    <p class="text-muted mb-0">Registros Totales</p>
+                                </div>
+                                
+                                <div class="col-md-9">
+                                    <div class="row">
+                                        <!-- Distribución por Edad -->
+                                        {% if distribucion_edad %}
+                                        <div class="col-md-6">
+                                            <h6>Distribución por Edad:</h6>
+                                            <div class="row">
+                                                {% for edad, info in distribucion_edad.items() %}
+                                                <div class="col-4 mb-2">
+                                                    <div class="text-center">
+                                                        <div class="badge p-2 mb-1" 
+                                                             style="background-color: {% if loop.index0 == 0 %}#2E8B57{% elif loop.index0 == 1 %}#FF8C00{% else %}#DAA520{% endif %}; color: white; font-size: 0.8rem;">
+                                                            {{ edad }}
+                                                        </div>
+                                                        <div>
+                                                            <strong>{{ info.cantidad }}</strong>
+                                                            <br>
+                                                            <small class="text-muted">{{ info.porcentaje }}%</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        
+                                        <!-- Distribución por Sexo -->
+                                        {% if distribucion_sexo %}
+                                        <div class="col-md-6">
+                                            <h6>Distribución por Sexo:</h6>
+                                            <div class="row">
+                                                {% for sexo, info in distribucion_sexo.items() %}
+                                                <div class="col-6 mb-2">
+                                                    <div class="text-center">
+                                                        <div class="badge p-2 mb-1" 
+                                                             style="background-color: {% if sexo == 'Macho' %}#2E8B57{% else %}#FF8C00{% endif %}; color: white; font-size: 0.8rem;">
+                                                            {{ sexo }}
+                                                        </div>
+                                                        <div>
+                                                            <strong>{{ info.cantidad }}</strong>
+                                                            <br>
+                                                            <small class="text-muted">{{ info.porcentaje }}%</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de Datos -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card border-0 shadow">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="fas fa-list me-2"></i>
+                                Datos de los {{ total_registros }} individuos
+                            </h5>
+                            <div>
+                                <button class="btn btn-sm btn-primary" onclick="exportarTablaCSV()">
+                                    <i class="fas fa-download me-1"></i>Exportar CSV
+                                </button>
+                                <button class="btn btn-sm btn-secondary" onclick="mostrarOcultarColumnas()">
+                                    <i class="fas fa-eye me-1"></i>Columnas
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <!-- Filtros Rápidos -->
+                            <div class="row mb-3" id="filtros-rapidos">
+                                <div class="col-md-4 mb-2">
+                                    <label class="form-label small">Filtrar por Edad:</label>
+                                    <select class="form-select form-select-sm" id="filtro-edad" onchange="filtrarTabla()">
+                                        <option value="">Todas las edades</option>
+                                        {% if distribucion_edad %}
+                                            {% for edad in distribucion_edad.keys() %}
+                                                <option value="{{ edad }}">{{ edad }}</option>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <label class="form-label small">Filtrar por Sexo:</label>
+                                    <select class="form-select form-select-sm" id="filtro-sexo" onchange="filtrarTabla()">
+                                        <option value="">Todos los sexos</option>
+                                        {% if distribucion_sexo %}
+                                            {% for sexo in distribucion_sexo.keys() %}
+                                                <option value="{{ sexo }}">{{ sexo }}</option>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <label class="form-label small">Buscar:</label>
+                                    <input type="text" class="form-control form-control-sm" 
+                                           id="buscar-tabla" placeholder="Buscar en todos los campos..." 
+                                           onkeyup="filtrarTabla()">
+                                </div>
+                            </div>
+                            
+                            <!-- Contador de resultados -->
+                            <div class="alert alert-light py-2 mb-3 d-flex justify-content-between align-items-center">
+                                <small id="contador-resultados">
+                                    Mostrando {{ total_registros }} registros
+                                </small>
+                                <small>
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="reiniciarFiltros()">
+                                        <i class="fas fa-redo me-1"></i>Reiniciar filtros
+                                    </button>
+                                </small>
+                            </div>
+                            
+                            <!-- Tabla de datos -->
+                            <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                                <table class="table table-hover table-striped table-sm" id="tabla-datos">
+                                    <thead class="table-light sticky-top">
+                                        <tr>
+                                            {% for columna in columnas %}
+                                            <th>
+                                                <div class="d-flex align-items-center">
+                                                    <span>{{ columna }}</span>
+                                                    <button class="btn btn-sm btn-link p-0 ms-1" 
+                                                            onclick="ordenarColumna('{{ columna }}')"
+                                                            title="Ordenar por {{ columna }}">
+                                                        <i class="fas fa-sort"></i>
+                                                    </button>
+                                                </div>
+                                            </th>
+                                            {% endfor %}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for registro in datos %}
+                                        <tr>
+                                            {% for columna in columnas %}
+                                            <td>
+                                                {% if columna == 'Peso_Kg' and registro[columna] is not none %}
+                                                    {{ "%.3f"|format(registro[columna]) }}
+                                                {% elif columna == 'Fecha_entrga_CAV' and registro[columna] is not none %}
+                                                    {{ registro[columna].strftime('%d/%m/%Y') if registro[columna] is string else registro[columna] }}
+                                                {% else %}
+                                                    {{ registro[columna] if registro[columna] is not none else '' }}
+                                                {% endif %}
+                                            </td>
+                                            {% endfor %}
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- Paginación -->
+                            <nav aria-label="Paginación" class="mt-3">
+                                <ul class="pagination justify-content-center pagination-sm">
+                                    <li class="page-item disabled">
+                                        <span class="page-link">Página</span>
+                                    </li>
+                                    <li class="page-item active"><span class="page-link">1</span></li>
+                                    <li class="page-item disabled">
+                                        <span class="page-link">de 1</span>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Información del Dataset -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Información del Dataset
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>Columnas disponibles ({{ columnas|length }}):</h6>
+                                    <div class="row">
+                                        {% for columna in columnas %}
+                                        <div class="col-md-6 mb-2">
+                                            <span class="badge bg-light text-dark">
+                                                <i class="fas fa-columns me-1"></i>{{ columna }}
+                                            </span>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Acciones disponibles:</h6>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <button class="btn btn-sm btn-outline-primary" onclick="exportarTablaCSV()">
+                                            <i class="fas fa-file-csv me-1"></i>Exportar CSV
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary" onclick="imprimirTabla()">
+                                            <i class="fas fa-print me-1"></i>Imprimir
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-info" onclick="copiarTabla()">
+                                            <i class="fas fa-copy me-1"></i>Copiar tabla
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Variable global para almacenar datos originales
+    let datosOriginales = {{ datos|tojson|safe }};
+    let columnaOrdenActual = null;
+    let ordenAscendente = true;
+    
+    // Función para filtrar la tabla
+    function filtrarTabla() {
+        const filtroEdad = document.getElementById('filtro-edad').value.toLowerCase();
+        const filtroSexo = document.getElementById('filtro-sexo').value.toLowerCase();
+        const buscarTexto = document.getElementById('buscar-tabla').value.toLowerCase();
+        
+        const filas = document.querySelectorAll('#tabla-datos tbody tr');
+        let registrosVisibles = 0;
+        
+        filas.forEach(fila => {
+            const celdas = fila.getElementsByTagName('td');
+            let mostrarFila = true;
+            
+            // Aplicar filtros
+            if (filtroEdad) {
+                const edad = celdas[5]?.textContent.toLowerCase() || ''; // Asumiendo que Edad es la columna 5
+                if (!edad.includes(filtroEdad)) {
+                    mostrarFila = false;
+                }
+            }
+            
+            if (filtroSexo && mostrarFila) {
+                const sexo = celdas[6]?.textContent.toLowerCase() || ''; // Asumiendo que Sexo es la columna 6
+                if (!sexo.includes(filtroSexo)) {
+                    mostrarFila = false;
+                }
+            }
+            
+            if (buscarTexto && mostrarFila) {
+                let encontrado = false;
+                for (let celda of celdas) {
+                    if (celda.textContent.toLowerCase().includes(buscarTexto)) {
+                        encontrado = true;
+                        break;
+                    }
+                }
+                if (!encontrado) {
+                    mostrarFila = false;
+                }
+            }
+            
+            // Mostrar/ocultar fila
+            fila.style.display = mostrarFila ? '' : 'none';
+            if (mostrarFila) registrosVisibles++;
+        });
+        
+        // Actualizar contador
+        document.getElementById('contador-resultados').textContent = 
+            `Mostrando ${registrosVisibles} de {{ total_registros }} registros`;
+    }
+    
+    // Función para ordenar por columna
+    function ordenarColumna(nombreColumna) {
+        const tabla = document.getElementById('tabla-datos');
+        const tbody = tabla.querySelector('tbody');
+        const filas = Array.from(tbody.querySelectorAll('tr'));
+        const indiceColumna = Array.from(tabla.querySelectorAll('thead th')).findIndex(th => 
+            th.textContent.includes(nombreColumna)
+        );
+        
+        if (indiceColumna === -1) return;
+        
+        // Cambiar orden si es la misma columna
+        if (columnaOrdenActual === nombreColumna) {
+            ordenAscendente = !ordenAscendente;
+        } else {
+            columnaOrdenActual = nombreColumna;
+            ordenAscendente = true;
+        }
+        
+        // Ordenar filas
+        filas.sort((a, b) => {
+            const valorA = a.cells[indiceColumna].textContent.trim();
+            const valorB = b.cells[indiceColumna].textContent.trim();
+            
+            // Intentar convertir a número si es posible
+            const numA = parseFloat(valorA.replace(',', '.'));
+            const numB = parseFloat(valorB.replace(',', '.'));
+            
+            if (!isNaN(numA) && !isNaN(numB)) {
+                return ordenAscendente ? numA - numB : numB - numA;
+            }
+            
+            // Ordenar como texto
+            return ordenAscendente 
+                ? valorA.localeCompare(valorB)
+                : valorB.localeCompare(valorA);
+        });
+        
+        // Reorganizar filas en la tabla
+        filas.forEach(fila => tbody.appendChild(fila));
+        
+        // Actualizar indicador visual
+        actualizarIndicadorOrden(nombreColumna);
+    }
+    
+    function actualizarIndicadorOrden(columna) {
+        // Remover indicadores anteriores
+        document.querySelectorAll('#tabla-datos thead th i').forEach(icon => {
+            icon.className = 'fas fa-sort';
+        });
+        
+        // Agregar nuevo indicador
+        const ths = document.querySelectorAll('#tabla-datos thead th');
+        ths.forEach((th, index) => {
+            if (th.textContent.includes(columna)) {
+                const icon = th.querySelector('i');
+                if (icon) {
+                    icon.className = ordenAscendente ? 'fas fa-sort-up' : 'fas fa-sort-down';
+                }
+            }
+        });
+    }
+    
+    // Función para exportar a CSV
+    function exportarTablaCSV() {
+        const tabla = document.getElementById('tabla-datos');
+        const filas = tabla.querySelectorAll('tr');
+        const csv = [];
+        
+        // Obtener encabezados
+        const encabezados = Array.from(filas[0].querySelectorAll('th')).map(th => {
+            return th.textContent.replace('↕', '').trim();
+        });
+        csv.push(encabezados.join(','));
+        
+        // Obtener datos (solo filas visibles)
+        Array.from(filas).slice(1).forEach(fila => {
+            if (fila.style.display !== 'none') {
+                const celdas = Array.from(fila.querySelectorAll('td')).map(celda => {
+                    let contenido = celda.textContent.trim();
+                    // Escapar comas y comillas
+                    if (contenido.includes(',') || contenido.includes('"') || contenido.includes('\n')) {
+                        contenido = '"' + contenido.replace(/"/g, '""') + '"';
+                    }
+                    return contenido;
+                });
+                csv.push(celdas.join(','));
+            }
+        });
+        
+        // Crear y descargar archivo
+        const csvContent = csv.join('\n');
+        const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        
+        link.href = url;
+        link.download = `iguana_datos_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        mostrarNotificacion('Tabla exportada como CSV', 'success');
+    }
+    
+    // Función para reiniciar filtros
+    function reiniciarFiltros() {
+        document.getElementById('filtro-edad').value = '';
+        document.getElementById('filtro-sexo').value = '';
+        document.getElementById('buscar-tabla').value = '';
+        filtrarTabla();
+        mostrarNotificacion('Filtros reiniciados', 'info');
+    }
+    
+    // Función para imprimir la tabla
+    function imprimirTabla() {
+        const contenidoOriginal = document.body.innerHTML;
+        const contenidoTabla = document.getElementById('tabla-datos').outerHTML;
+        
+        // Crear ventana de impresión
+        const ventana = window.open('', '_blank');
+        ventana.document.write(`
+            <html>
+            <head>
+                <title>Tabla de Datos - Estudio Iguana</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; }
+                    table { width: 100%; border-collapse: collapse; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    th { background-color: #2E8B57; color: white; }
+                    tr:nth-child(even) { background-color: #f2f2f2; }
+                    .header { text-align: center; margin-bottom: 20px; }
+                    .footer { margin-top: 20px; font-size: 12px; color: #666; }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>Estudio de Iguanas - Cartagena 2025</h1>
+                    <p>Tabla de datos completa ({{ total_registros }} registros)</p>
+                    <p>Generado: ${new Date().toLocaleDateString()}</p>
+                </div>
+                ${contenidoTabla}
+                <div class="footer">
+                    <p>Dashboard de Análisis Poblacional de Iguana iguana</p>
+                </div>
+            </body>
+            </html>
+        `);
+        ventana.document.close();
+        ventana.print();
+    }
+    
+    // Función para copiar tabla al portapapeles
+    function copiarTabla() {
+        const tabla = document.getElementById('tabla-datos');
+        const rango = document.createRange();
+        rango.selectNode(tabla);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(rango);
+        
+        try {
+            document.execCommand('copy');
+            mostrarNotificacion('Tabla copiada al portapapeles', 'success');
+        } catch (err) {
+            mostrarNotificacion('Error al copiar: ' + err, 'error');
+        }
+        
+        window.getSelection().removeAllRanges();
+    }
+    
+    // Inicializar tabla cuando cargue la página
+    document.addEventListener('DOMContentLoaded', function() {
+        // Agregar tooltips a los botones de ordenar
+        document.querySelectorAll('#tabla-datos thead button').forEach(btn => {
+            btn.setAttribute('title', 'Haz clic para ordenar');
+        });
+        
+        // Configurar DataTable si la librería está disponible
+        if (typeof $ !== 'undefined' && $.fn.DataTable) {
+            $('#tabla-datos').DataTable({
+                pageLength: 25,
+                lengthMenu: [10, 25, 50, 100, -1],
+                initComplete: function(settings, json) {
+                    console.log('DataTables inicializado correctamente. Versión:', $.fn.dataTable.version);
+                },
+                paging: true,
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+                },
+                dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rt<"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>'
+            });
+        }
+    });
+</script>
+{% endblock %}

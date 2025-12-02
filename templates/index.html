@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio{% endblock %}
+
+{% block content %}
+<div class="animate-fade-in">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-lg" style="background: linear-gradient(135deg, var(--color-primario) 0%, #26734a 100%);">
+                <div class="card-body text-white p-5">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h1 class="display-4 fw-bold mb-3">
+                                <i class="fas fa-dragon me-3"></i>
+                                Análisis Poblacional de Iguana iguana
+                            </h1>
+                            <p class="lead mb-4">
+                                Dashboard interactivo para el estudio ecológico de la población de iguanas 
+                                en el área urbana de Cartagena de Indias, Colombia (2025)
+                            </p>
+                            <div class="d-flex gap-3">
+                                <a href="/dashboard" class="btn btn-light btn-lg">
+                                    <i class="fas fa-chart-line me-2"></i>Ver Dashboard
+                                </a>
+                                <a href="/graficos" class="btn btn-outline-light btn-lg">
+                                    <i class="fas fa-chart-bar me-2"></i>Explorar Gráficos
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <i class="fas fa-dragon fa-10x opacity-25"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Objetivos del Estudio -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="text-center mb-4" style="color: var(--color-primario);">
+                <i class="fas fa-bullseye me-2"></i>
+                Objetivos del Estudio
+            </h2>
+            
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                <i class="fas fa-users fa-3x" style="color: var(--color-primario);"></i>
+                            </div>
+                            <h5 class="card-title">Caracterización Poblacional</h5>
+                            <p class="card-text text-muted">
+                                Estructura por edad, sexo y parámetros biométricos de 279 individuos
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                <i class="fas fa-venus-mars fa-3x" style="color: var(--color-destacado);"></i>
+                            </div>
+                            <h5 class="card-title">Dimorfismo Sexual</h5>
+                            <p class="card-text text-muted">
+                                Identificación de patrones de diferenciación en condiciones urbanas
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                <i class="fas fa-chart-line fa-3x" style="color: var(--color-accent);"></i>
+                            </div>
+                            <h5 class="card-title">Composición Demográfica</h5>
+                            <p class="card-text text-muted">
+                                Análisis de significado ecológico y patrones poblacionales
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                <i class="fas fa-database fa-3x" style="color: var(--color-secundario);"></i>
+                            </div>
+                            <h5 class="card-title">Líneas Base</h5>
+                            <p class="card-text text-muted">
+                                Generación de datos para monitoreo y conservación futuros
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Variables del Dataset -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow">
+                <div class="card-header bg-white">
+                    <h4 class="mb-0" style="color: var(--color-primario);">
+                        <i class="fas fa-table me-2"></i>
+                        Variables del Estudio
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Variable</th>
+                                    <th>Tipo</th>
+                                    <th>Descripción</th>
+                                    <th>Rango/Valores</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Individuos</strong></td>
+                                    <td><span class="badge bg-secondary">int</span></td>
+                                    <td>Identificador único secuencial</td>
+                                    <td>1-279</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Peso_Kg</strong></td>
+                                    <td><span class="badge bg-info">float</span></td>
+                                    <td>Peso corporal en kilogramos</td>
+                                    <td>0.235 - 6.5 kg</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Edad</strong></td>
+                                    <td><span class="badge bg-warning">categórica</span></td>
+                                    <td>Categoría de edad del individuo</td>
+                                    <td>Adulto, Subadulto, Juvenil</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Sexo</strong></td>
+                                    <td><span class="badge bg-warning">categórica</span></td>
+                                    <td>Sexo del individuo</td>
+                                    <td>Macho (62.7%), Hembra</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Accesos Rápidos -->
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 border-0 shadow-sm hover-shadow">
+                <div class="card-body text-center p-5">
+                    <i class="fas fa-tachometer-alt fa-4x mb-4" style="color: var(--color-primario);"></i>
+                    <h4 class="card-title mb-3">Dashboard de Métricas</h4>
+                    <p class="card-text text-muted mb-4">
+                        Visualiza los KPIs principales, distribución poblacional y estadísticas clave del estudio.
+                    </p>
+                    <a href="/dashboard" class="btn btn-primary">
+                        <i class="fas fa-arrow-right me-2"></i>Acceder al Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 border-0 shadow-sm hover-shadow">
+                <div class="card-body text-center p-5">
+                    <i class="fas fa-chart-line fa-4x mb-4" style="color: var(--color-destacado);"></i>
+                    <h4 class="card-title mb-3">Gráficos Interactivos</h4>
+                    <p class="card-text text-muted mb-4">
+                        Explora visualizaciones avanzadas y análisis detallados de los datos del estudio.
+                    </p>
+                    <a href="/graficos" class="btn btn-primary">
+                        <i class="fas fa-arrow-right me-2"></i>Ver Gráficos
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Animación de entrada
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.card');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                card.style.transition = 'opacity 0.5s, transform 0.5s';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    });
+</script>
+{% endblock %}

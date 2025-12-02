@@ -1,0 +1,19 @@
+# Entorno virtual
+venv/
+env/
+.env
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+pip-log.txt
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Railway
+railway.json
